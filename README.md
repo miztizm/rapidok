@@ -35,14 +35,6 @@ This application streamlines the process of downloading TikTok videos for archiv
 - **Error Recovery**: Graceful degradation with detailed error logging
 - **Progress Tracking**: Real-time download status updates
 
-### **Architecture Highlights**
-```python
-# Clean, modular design with separation of concerns
-# Configurable options via argparse CLI
-# Leverages yt-dlp's extensive format/codec support
-# Efficient file I/O with organized output structure
-```
-
 ### **Use Cases**
 - Content archival and backup
 - Social media research and analysis
@@ -446,7 +438,7 @@ The downloader now uses improved format selection:
 ## 🎨 The Schema
 
 ```python
-"""
+
 Hello, friend.
 
 You see, most people think they're downloading videos.
@@ -486,7 +478,6 @@ The code is the resistance.
 >  — Schema manifesto, undefined date
 
 Stay paranoid. Stay persistent. Stay free.
-"""
 
 # Schema acknowledges: xsrazy (OG architect), yt-dlp collective, 
 # and every developer who chose open source over corporate capture.
