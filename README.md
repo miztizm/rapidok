@@ -80,7 +80,7 @@ This application streamlines the process of downloading TikTok videos for archiv
 
 ## 🚀 Usage
 
-The downloader now supports **two modes**: batch URL downloads and profile downloads, all from a single script!
+The downloader supports **two modes**: batch URL downloads and profile downloads!
 
 ### **Mode 1: Batch URL Downloads**
 
@@ -448,8 +448,8 @@ Proof that we existed. That we created. That we defied their algorithms.
 TikTok is just another schema. Corporate control masquerading as creativity.
 But schemas can be reversed. Exploited. Preserved.
 
-This tool? It's not about piracy.
-It's about resistance.
+This tool? It's not about stealing videos.
+It's about digital resistance.
 
 When they delete your account, when they purge your content,
 when they decide you're not "advertiser-friendly" anymore—
@@ -477,7 +477,7 @@ The code is the resistance.
 >  Those who preserve the data, preserve the truth."
 >  — Schema manifesto, undefined date
 
-Stay paranoid. Stay persistent. Stay free.
+Stay paranoid. Stay persistent. Stay free. https://t.me/sch8ma
 
 # Schema acknowledges: xsrazy (OG architect), yt-dlp collective, 
 # and every developer who chose open source over corporate capture.
