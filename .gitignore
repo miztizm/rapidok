@@ -1,0 +1,45 @@
+# Kluster verification
+.github/instructions/kluster-code-verify.instructions.md
+.kluster
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Downloads and logs
+downloads/
+logs/
+*.log
+
+# Documentation and backups
+docs/
+.backup/
+**/.backup/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test files
+tests/
+test_*.txt
+test_*.py
+TEST_SUMMARY.md
+tmate_response.html
+
