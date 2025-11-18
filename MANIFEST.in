@@ -1,0 +1,20 @@
+# Include documentation and license files
+include README.md
+include LICENSE
+include CHANGELOG.md
+include CONTRIBUTING.md
+include requirements.txt
+
+# Exclude unnecessary files
+exclude urls.txt
+exclude links.txt
+global-exclude *.pyc
+recursive-exclude downloads *
+recursive-exclude logs *
+recursive-exclude __pycache__ *
+recursive-exclude .github *
+recursive-exclude tests *
+recursive-exclude docs *
+recursive-exclude scripts *
+recursive-exclude tools *
+

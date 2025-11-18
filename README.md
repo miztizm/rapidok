@@ -50,7 +50,30 @@ This application streamlines the process of downloading TikTok videos for archiv
 - Python 3.6 or higher: [Download Python](https://www.python.org/downloads/)
 - pip (Python package manager)
 
-### **Setup Steps**
+### **Method 1: Install from PyPI (Recommended)**
+
+Install rapidok directly from PyPI using pip:
+
+```bash
+pip install rapidok
+```
+
+After installation, you can run the tool using the `rapidok` command:
+
+```bash
+# Download from a profile
+rapidok --profile username
+
+# Download from URLs
+rapidok --links urls.txt
+
+# Show help
+rapidok --help
+```
+
+### **Method 2: Install from Source**
+
+If you want to install from source or contribute to development:
 
 1. **Clone the Repository**
    ```bash
@@ -62,18 +85,24 @@ This application streamlines the process of downloading TikTok videos for archiv
    ```bash
    # Create venv
    python -m venv venv
-   
+
    # Activate
    # Windows:
    .\venv\Scripts\activate
-   
+
    # Linux/Mac:
    source venv/bin/activate
    ```
 
-3. **Install Dependencies**
+3. **Install in Development Mode**
+   ```bash
+   pip install -e .
+   ```
+
+   Or install dependencies only:
    ```bash
    pip install -r requirements.txt
+   # Then run with: python run.py
    ```
 
 ---
@@ -81,6 +110,8 @@ This application streamlines the process of downloading TikTok videos for archiv
 ## 🚀 Usage
 
 The downloader supports **two modes**: batch URL downloads and profile downloads!
+
+> **Note**: If you installed via PyPI, use the `rapidok` command. If running from source, use `python run.py` instead.
 
 ### **Mode 1: Batch URL Downloads**
 
@@ -94,22 +125,22 @@ Download specific videos from a list of URLs:
 
 2. Run the downloader:
    ```bash
-   python run.py --links urls.txt
+   rapidok --links urls.txt
    ```
 
 ### **Batch Download Options:**
 ```bash
 # Basic download with safe defaults (2 workers, 2s delay)
-python run.py
+rapidok --links urls.txt
 
 # Custom URL file with balanced settings
-python run.py --links my_urls.txt --workers 3 --delay 2.5
+rapidok --links my_urls.txt --workers 3 --delay 2.5
 
 # Conservative approach for large batches
-python run.py --links large_batch.txt --workers 1 --delay 5 --throttle-rate 1M
+rapidok --links large_batch.txt --workers 1 --delay 5 --throttle-rate 1M
 
 # Download with watermarks (faster - less format selection)
-python run.py --links urls.txt --watermark --workers 2
+rapidok --links urls.txt --watermark --workers 2
 ```
 
 ### **Mode 2: Profile Downloads**
@@ -118,22 +149,22 @@ Download content from a TikTok user's profile with powerful filtering options:
 
 ```bash
 # Download videos only (default behavior - skips audio-only posts)
-python run.py --profile miztizm
+rapidok --profile miztizm
 
 # Download ALL content types (videos, audio, images, metadata)
-python run.py --profile miztizm --content-type all
+rapidok --profile miztizm --content-type all
 
 # Download only audio posts (photo slideshows with voiceover)
-python run.py --profile miztizm --content-type audio-only
+rapidok --profile miztizm --content-type audio-only
 
 # Download only image posts
-python run.py --profile miztizm --content-type images-only
+rapidok --profile miztizm --content-type images-only
 
 # Extract metadata only (no downloads, just save post info as JSON)
-python run.py --profile miztizm --content-type metadata-only
+rapidok --profile miztizm --content-type metadata-only
 
 # Combine with other options
-python run.py --profile miztizm --content-type all --max-downloads 20 --output-dir my_archive
+rapidok --profile miztizm --content-type all --max-downloads 20 --output-dir my_archive
 ```
 
 **Content Type Options:**
@@ -177,10 +208,10 @@ downloads/
 ### **Command-Line Options**
 
 ```
-usage: run.py [-h] [--links LINKS | --profile PROFILE] 
-              [--no-watermark | --watermark] [--workers WORKERS] 
-              [--output-dir OUTPUT_DIR] [--max-downloads MAX_DOWNLOADS] 
-              [--no-archive] [--content-type {all,video-only,audio-only,images-only,metadata-only}]
+usage: rapidok [-h] [--links LINKS | --profile PROFILE]
+               [--no-watermark | --watermark] [--workers WORKERS]
+               [--output-dir OUTPUT_DIR] [--max-downloads MAX_DOWNLOADS]
+               [--no-archive] [--content-type {all,video-only,audio-only,images-only,metadata-only}]
 
 Mode Selection (choose one):
   --links LINKS         Path to .txt file with TikTok URLs for batch download
@@ -204,7 +235,7 @@ Rate Limiting & Safety:
   --max-delay SECONDS   Maximum delay between downloads (use with --min-delay for custom range)
   --throttle-rate SPEED Limit download speed (e.g., 500K, 1M, 2M for bytes/sec)
   --no-rate-limit       ⚠️ DISABLE ALL LIMITS (NOT RECOMMENDED - high risk of IP ban)
-  
+
 Profile Mode Filtering:
   --content-type {all,video-only,audio-only,images-only,metadata-only}
                         Type of content to download (Default: video-only)
@@ -217,64 +248,49 @@ Profile Mode Filtering:
 
 ### **Examples**
 
-**Batch URL Downloads:**
-
-```
-usage: run.py [-h] [--links LINKS] [--no-watermark | --watermark] [--workers WORKERS]
-
-options:
-  -h, --help           Show this help message and exit
-  --links LINKS        Path to .txt file containing TikTok URLs (Default: links.txt)
-  --no-watermark       Download videos without watermarks (Default)
-  --watermark          Download videos with watermarks
-  --workers WORKERS    Number of concurrent downloads (Default: 3)
-```
-
-### **Examples**
-
 **Profile Downloads:**
 ```bash
 # Download all videos from a user (default - video posts only)
-python run.py --profile miztizm
+rapidok --profile miztizm
 
 # Download latest 20 videos only
-python run.py --profile miztizm --max-downloads 20
+rapidok --profile miztizm --max-downloads 20
 
 # Download ALL content types (videos + images + metadata)
-python run.py --profile miztizm --content-type all
+rapidok --profile miztizm --content-type all
 
 # Download only image posts (photo carousels/slideshows)
-python run.py --profile miztizm --content-type images-only
+rapidok --profile miztizm --content-type images-only
 
 # Extract metadata only (titles, descriptions, stats) without downloads
-python run.py --profile miztizm --content-type metadata-only
+rapidok --profile miztizm --content-type metadata-only
 
 # Save detailed metadata JSON files for each download
-python run.py --profile miztizm --content-type all --save-metadata
+rapidok --profile miztizm --content-type all --save-metadata
 
 # Skip files that already exist (resume interrupted downloads)
-python run.py --profile miztizm --skip-existing
+rapidok --profile miztizm --skip-existing
 
 # Download to custom directory without watermarks
-python run.py --profile miztizm --output-dir my_collection --content-type all
+rapidok --profile miztizm --output-dir my_collection --content-type all
 ```
 
 **Batch URL Downloads:**
 ```bash
 # Download videos from links.txt with safe defaults
-python run.py
+rapidok --links urls.txt
 
 # Custom file with rate limiting
-python run.py --links urls.txt --workers 2 --delay 3
+rapidok --links urls.txt --workers 2 --delay 3
 
 # Conservative mode for avoiding blocks
-python run.py --links urls.txt --workers 1 --delay 5 --throttle-rate 500K
+rapidok --links urls.txt --workers 1 --delay 5 --throttle-rate 500K
 
 # Download with watermarks and skip existing files
-python run.py --watermark --skip-existing
+rapidok --links urls.txt --watermark --skip-existing
 
 # Save metadata for all downloads with safe settings
-python run.py --links urls.txt --save-metadata --delay 2.5
+rapidok --links urls.txt --save-metadata --delay 2.5
 ```
 
 ---
@@ -296,24 +312,24 @@ python run.py --links urls.txt --save-metadata --delay 2.5
 **Safe (Recommended):**
 ```bash
 # Default settings - safest option
-python run.py --links urls.txt
+rapidok --links urls.txt
 
 # Explicit safe mode with throttling
-python run.py --links urls.txt --workers 2 --delay 3 --throttle-rate 1M
+rapidok --links urls.txt --workers 2 --delay 3 --throttle-rate 1M
 ```
 
 **Moderate (Faster but higher risk):**
 ```bash
 # 3-5 workers with delays
-python run.py --links urls.txt --workers 3 --delay 2
-python run.py --links urls.txt --workers 5 --delay 1.5
+rapidok --links urls.txt --workers 3 --delay 2
+rapidok --links urls.txt --workers 5 --delay 1.5
 ```
 
 **Aggressive (NOT RECOMMENDED - High ban risk):**
 ```bash
-# 8+ workers with no delays 
-python run.py --links urls.txt --workers 8  # ⚠️ WARNING ISSUED
-python run.py --links urls.txt --workers 10 --no-rate-limit  # 🚨 DANGER
+# 8+ workers with no delays
+rapidok --links urls.txt --workers 8  # ⚠️ WARNING ISSUED
+rapidok --links urls.txt --workers 10 --no-rate-limit  # 🚨 DANGER
 ```
 
 ### **Command-Line Rate Limiting Options**
@@ -331,19 +347,19 @@ python run.py --links urls.txt --workers 10 --no-rate-limit  # 🚨 DANGER
 
 ```bash
 # Conservative: 1 worker, 4-6 second random delays, 500KB/s throttle
-python run.py --links urls.txt --workers 1 --delay 5 --throttle-rate 500K
+rapidok --links urls.txt --workers 1 --delay 5 --throttle-rate 500K
 
 # Balanced: 2 workers, 2-3 second delays (default)
-python run.py --links urls.txt
+rapidok --links urls.txt
 
 # Custom delay range: 1-4 seconds between downloads
-python run.py --links urls.txt --workers 2 --min-delay 1 --max-delay 4  # Much safer!
+rapidok --links urls.txt --workers 2 --min-delay 1 --max-delay 4  # Much safer!
 
 # Speed-limited downloads at 1MB/s
-python run.py --links urls.txt --throttle-rate 1M
+rapidok --links urls.txt --throttle-rate 1M
 
 # Profile downloads with throttling
-python run.py --profile miztizm --delay 3 --throttle-rate 2M
+rapidok --profile miztizm --delay 3 --throttle-rate 2M
 ```
 
 ### **What Happens If You Get Blocked?**

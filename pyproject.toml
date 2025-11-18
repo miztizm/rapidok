@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rapidok"
+version = "2.0.0"
+description = "A robust, concurrent TikTok content downloader built with Python and yt-dlp"
+readme = "README.md"
+requires-python = ">=3.6"
+license = "MIT"
+keywords = ["tiktok", "downloader", "video", "yt-dlp", "content", "archival"]
+authors = [
+    {name = "miztizm", email = "617020+miztizm@users.noreply.github.com"},
+    {name = "xsrazy (Original Author)"}
+]
+maintainers = [
+    {name = "miztizm", email = "617020+miztizm@users.noreply.github.com"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+]
+
+dependencies = [
+    "yt-dlp>=2023.0.0",
+    "tqdm>=4.0.0",
+    "urllib3>=1.26.0",
+    "requests>=2.25.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=22.0.0",
+    "pylint>=2.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/miztizm/rapidok"
+Repository = "https://github.com/miztizm/rapidok"
+Issues = "https://github.com/miztizm/rapidok/issues"
+Changelog = "https://github.com/miztizm/rapidok/blob/main/CHANGELOG.md"
+
+[project.scripts]
+rapidok = "rapidok.main:main"
+
+[tool.setuptools]
+packages = ["rapidok"]
+
+[tool.setuptools.package-data]
+rapidok = ["*.txt"]
+
+[tool.black]
+line-length = 100
+target-version = ['py36', 'py37', 'py38', 'py39', 'py310', 'py311', 'py312']
+
+[tool.pylint.messages_control]
+max-line-length = 100
+
