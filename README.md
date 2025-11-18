@@ -504,10 +504,6 @@ Stay paranoid. Stay persistent. Stay free. https://t.me/sch8ma
 
 This project is a modernized fork and enhancement of the original **TikTok Video Downloader** created by **[xsrazy](https://github.com/xsrazy/Download-All-Tiktok-Videos)**.
 
-### **Original Author**
-- **GitHub**: [@xsrazy](https://github.com/xsrazy)
-- **Original Repository**: [Download-All-Tiktok-Videos](https://github.com/xsrazy/Download-All-Tiktok-Videos)
-
 ### **Modifications by miztizm**
 - Migrated from deprecated tmate.cc service to `yt-dlp`
 - Enhanced error handling and logging
