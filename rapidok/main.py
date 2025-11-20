@@ -12,8 +12,19 @@ from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 import urllib3
 
+# Rich library imports for enhanced terminal output
+from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, BarColumn, TextColumn, TimeRemainingColumn, DownloadColumn, TransferSpeedColumn
+from rich.table import Table
+from rich.panel import Panel
+from rich import box
+from rich.text import Text
+
 # Disable SSL warnings for image downloads (TikTok CDN certificate issues)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+# Initialize rich console
+console = Console()
 
 
 class SuppressLogger:
@@ -185,7 +196,7 @@ def download_image_from_url(url: str, output_path: str) -> bool:
 
         return True
     except Exception as e:
-        print(f"    Error downloading image: {e}")
+        console.print(f"    [red]✗[/red] Error downloading image: {e}")
         return False
 
 
@@ -222,7 +233,7 @@ def download_from_url(link: str, watermark: bool, args, delay_min, delay_max) ->
             for ext in ['mp4', 'webm', 'mkv', 'm4a', 'mp3', 'jpg', 'jpeg']:
                 potential_file = os.path.join(folder_name, f"{video_id}.{ext}")
                 if os.path.exists(potential_file):
-                    print(f"\033[93mSkipping\033[0m: {username}/{video_id} (already exists)")
+                    console.print(f"[yellow]⊘[/yellow] Skipping: {username}/{video_id} (already exists)")
                     return
 
         # Configure yt-dlp options with rate limiting and anti-detection
@@ -267,7 +278,7 @@ def download_from_url(link: str, watermark: bool, args, delay_min, delay_max) ->
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(link, download=True)
             title = info.get('title', 'Unknown')
-            print(f"\033[92mDownloaded\033[0m: {username}/{video_id} - {title}")
+            console.print(f"[green]✓[/green] Downloaded: {username}/{video_id} - {title}")
 
             # Save metadata if requested
             if args.save_metadata:
@@ -294,7 +305,7 @@ def download_from_url(link: str, watermark: bool, args, delay_min, delay_max) ->
                     }, f, indent=4, ensure_ascii=False)
 
     except Exception as e:
-        print(f"\033[91mError\033[0m: {link} - {str(e)}")
+        console.print(f"[red]✗[/red] Error: {link} - {str(e)}")
         error_log = os.path.join("logs", "errors.txt")
         os.makedirs("logs", exist_ok=True)
         with open(error_log, 'a', encoding='utf-8') as error:
@@ -347,18 +358,21 @@ def download_user_profile(
     if content_type in ['all', 'images-only']:
         os.makedirs(images_dir, exist_ok=True)
 
-    print(f"\n{'='*70}")
-    print(f"Downloading from: @{clean_username}")
-    print(f"Profile URL: {profile_url}")
-    print(f"Output directory: {user_output_dir}")
-    print(f"Content type: {content_type}")
-    print(f"Archive tracking: {'Enabled' if use_archive else 'Disabled'}")
+    # Display profile download configuration in a panel
+    config_text = f"""[cyan]Profile:[/cyan] @{clean_username}
+[cyan]URL:[/cyan] {profile_url}
+[cyan]Output:[/cyan] {user_output_dir}
+[cyan]Content Type:[/cyan] {content_type}
+[cyan]Archive:[/cyan] {'Enabled' if use_archive else 'Disabled'}"""
+
     if max_downloads:
-        print(f"Max downloads: {max_downloads}")
-    print(f"{'='*70}\n")
+        config_text += f"\n[cyan]Max Downloads:[/cyan] {max_downloads}"
+
+    console.print(Panel(config_text, title="[bold blue]Profile Download Configuration[/bold blue]", border_style="blue", box=box.ROUNDED))
+    console.print()
 
     # First pass: Extract metadata for all posts
-    print("Fetching profile information...")
+    console.print("[bold cyan]Fetching profile information...[/bold cyan]")
 
     ydl_opts_extract = {
         'nocheckcertificate': True,
@@ -384,13 +398,13 @@ def download_user_profile(
             info = ydl.extract_info(profile_url, download=False)
 
             if not info or 'entries' not in info:
-                print("No posts found in profile")
+                console.print("[red]✗[/red] No posts found in profile")
                 return {'success': False, 'error': 'No posts found'}
 
             entries = [e for e in info['entries'] if e is not None]
             total_posts = len(entries)
 
-            print(f"Found {total_posts} posts in profile\n")
+            console.print(f"[green]✓[/green] Found {total_posts} posts in profile\n")
 
             for entry in entries[:max_downloads] if max_downloads else entries:
                 metadata = extract_metadata(entry)
@@ -412,7 +426,7 @@ def download_user_profile(
                     'total_posts': len(all_metadata),
                     'posts': all_metadata
                 }, f, indent=2, ensure_ascii=False)
-            print(f"✓ Saved metadata for {len(all_metadata)} posts to {metadata_file}\n")
+            console.print(f"[green]✓[/green] Saved metadata for {len(all_metadata)} posts to {metadata_file}\n")
 
         # If metadata-only, we're done
         if content_type == 'metadata-only':
@@ -425,7 +439,7 @@ def download_user_profile(
 
         # Download filtered posts
         if not posts_to_download:
-            print(f"No posts match filter '{content_type}'\n")
+            console.print(f"[yellow]⚠[/yellow] No posts match filter '{content_type}'\n")
             return {
                 'success': True,
                 'username': clean_username,
@@ -433,7 +447,7 @@ def download_user_profile(
                 'message': f'No {content_type} posts found'
             }
 
-        print(f"Downloading {len(posts_to_download)} posts matching '{content_type}' filter...\n")
+        console.print(f"[bold cyan]Downloading {len(posts_to_download)} posts matching '{content_type}' filter...[/bold cyan]\n")
 
         downloads_completed = 0
 
@@ -457,13 +471,13 @@ def download_user_profile(
 
                         # Skip if file already exists
                         if args and args.skip_existing and os.path.exists(output_path):
-                            print(f"  [{idx}/{len(posts_to_download)}] \033[93mSkipping\033[0m: {title}... (already exists)")
+                            console.print(f"  [{idx}/{len(posts_to_download)}] [yellow]⊘[/yellow] Skipping: {title}... (already exists)")
                             downloads_completed += 1
                             continue
 
                         if download_image_from_url(thumbnail_url, output_path):
                             downloads_completed += 1
-                            print(f"  [{idx}/{len(posts_to_download)}] Downloaded image: {title}... ({post_type})")
+                            console.print(f"  [{idx}/{len(posts_to_download)}] [green]✓[/green] Downloaded image: {title}... ({post_type})")
 
                             # Mark in archive if enabled
                             if use_archive:
@@ -471,9 +485,9 @@ def download_user_profile(
                                 with open(archive_path, 'a', encoding='utf-8') as f:
                                     f.write(f"tiktok {post_id}\n")
                         else:
-                            print(f"  [{idx}/{len(posts_to_download)}] Failed to download image: {title}")
+                            console.print(f"  [{idx}/{len(posts_to_download)}] [red]✗[/red] Failed to download image: {title}")
                 else:
-                    print(f"  [{idx}/{len(posts_to_download)}] No thumbnails available for: {title}")
+                    console.print(f"  [{idx}/{len(posts_to_download)}] [yellow]⚠[/yellow] No thumbnails available for: {title}")
                 continue
 
             # Handle video and audio posts with yt-dlp
@@ -491,7 +505,7 @@ def download_user_profile(
                     f for f in os.listdir(target_dir) if f.endswith((f'[{post_id}].mp4', f'[{post_id}].m4a', f'[{post_id}].webm'))
                 ] if os.path.exists(target_dir) else []
                 if potential_files:
-                    print(f"  [{idx}/{len(posts_to_download)}] \033[93mSkipping\033[0m: {title}... (already exists)")
+                    console.print(f"  [{idx}/{len(posts_to_download)}] [yellow]⊘[/yellow] Skipping: {title}... (already exists)")
                     downloads_completed += 1
                     continue
 
@@ -545,17 +559,24 @@ def download_user_profile(
                 with yt_dlp.YoutubeDL(ydl_opts_download) as ydl:
                     ydl.download([entry.get('webpage_url', entry.get('url'))])
                     downloads_completed += 1
-                    print(f"  [{idx}/{len(posts_to_download)}] Downloaded: {title}... ({post_type})")
+                    console.print(f"  [{idx}/{len(posts_to_download)}] [green]✓[/green] Downloaded: {title}... ({post_type})")
             except Exception as e:
-                print(f"  [{idx}/{len(posts_to_download)}] Error downloading {post_id}: {e}")
+                console.print(f"  [{idx}/{len(posts_to_download)}] [red]✗[/red] Error downloading {post_id}: {e}")
                 continue
 
-        print(f"\n{'='*70}")
-        print(f"✓ Download complete!")
-        print(f"Username: @{clean_username}")
-        print(f"Posts downloaded: {downloads_completed}/{len(posts_to_download)}")
-        print(f"Content type: {content_type}")
-        print(f"{'='*70}\n")
+        # Create summary table
+        summary_table = Table(title="Download Summary", box=box.ROUNDED, border_style="green")
+        summary_table.add_column("Metric", style="cyan", no_wrap=True)
+        summary_table.add_column("Value", style="white")
+
+        summary_table.add_row("Username", f"@{clean_username}")
+        summary_table.add_row("Posts Downloaded", f"{downloads_completed}/{len(posts_to_download)}")
+        summary_table.add_row("Content Type", content_type)
+        summary_table.add_row("Output Directory", user_output_dir)
+
+        console.print()
+        console.print(summary_table)
+        console.print()
 
         return {
             'success': True,
@@ -568,12 +589,16 @@ def download_user_profile(
     except Exception as e:
         error_str = str(e)
         if "Maximum number of downloads reached" in error_str or "max-downloads" in error_str:
-            print(f"\n{'='*70}")
-            print(f"✓ Reached maximum download limit: {max_downloads}")
-            print(f"{'='*70}\n")
+            console.print()
+            console.print(Panel(f"[green]✓[/green] Reached maximum download limit: {max_downloads}",
+                              title="[bold green]Download Limit Reached[/bold green]",
+                              border_style="green",
+                              box=box.ROUNDED))
+            console.print()
             return {'success': True, 'posts_downloaded': max_downloads}
 
-        print(f"\n✗ Error downloading profile: {e}\n")
+        console.print()
+        console.print(f"[red]✗[/red] Error downloading profile: {e}\n")
         return {'success': False, 'error': str(e)}
 
 
@@ -620,14 +645,28 @@ def main():
 
     # Validate and warn about rate limiting
     if args.workers > 5:
-        print("\n⚠️  WARNING: Using >5 concurrent workers increases risk of IP blocking!")
-        print("   Recommended: 2-5 workers with delays enabled.")
-        print("   Proceed at your own risk.\n")
+        console.print()
+        console.print(Panel(
+            "[yellow]⚠[/yellow]  WARNING: Using >5 concurrent workers increases risk of IP blocking!\n"
+            "   Recommended: 2-5 workers with delays enabled.\n"
+            "   Proceed at your own risk.",
+            title="[bold yellow]High Worker Count Warning[/bold yellow]",
+            border_style="yellow",
+            box=box.ROUNDED
+        ))
+        console.print()
         time.sleep(2)  # Give user time to read warning
 
     if args.no_rate_limit:
-        print("\n⚠️  DANGER: Rate limiting disabled! High risk of TikTok blocking your IP.")
-        print("   This is NOT recommended for batch downloads.\n")
+        console.print()
+        console.print(Panel(
+            "[red]⚠[/red]  DANGER: Rate limiting disabled! High risk of TikTok blocking your IP.\n"
+            "   This is NOT recommended for batch downloads.",
+            title="[bold red]Rate Limiting Disabled[/bold red]",
+            border_style="red",
+            box=box.ROUNDED
+        ))
+        console.print()
         time.sleep(2)
 
     # Calculate delay range
@@ -635,7 +674,7 @@ def main():
         delay_min = args.min_delay
         delay_max = args.max_delay
     elif args.min_delay or args.max_delay:
-        print("Error: --min-delay and --max-delay must be used together")
+        console.print("[red]✗[/red] Error: --min-delay and --max-delay must be used together")
         exit(1)
     else:
         # Add +/- 50% jitter to base delay
@@ -663,12 +702,31 @@ def main():
         with open(args.links, "r") as links:
             tiktok_links = links.read().split("\n")
 
-        print(f"\nBatch downloading {len([l for l in tiktok_links if l.strip()])} videos with {args.workers} workers...\n")
+        valid_links = [l for l in tiktok_links if l.strip()]
+
+        console.print()
+        console.print(Panel(
+            f"[cyan]Links File:[/cyan] {args.links}\n"
+            f"[cyan]Total URLs:[/cyan] {len(valid_links)}\n"
+            f"[cyan]Workers:[/cyan] {args.workers}\n"
+            f"[cyan]Output:[/cyan] {args.output_dir}",
+            title="[bold blue]Batch Download Configuration[/bold blue]",
+            border_style="blue",
+            box=box.ROUNDED
+        ))
+        console.print()
 
         with futures.ThreadPoolExecutor(max_workers=args.workers) as executor:
             executor.map(lambda link: download_from_url(link, args.watermark, args, delay_min, delay_max), tiktok_links)
 
-        print("\n✓ Batch download complete!\n")
+        console.print()
+        console.print(Panel(
+            "[green]✓[/green] All downloads completed!",
+            title="[bold green]Batch Download Complete[/bold green]",
+            border_style="green",
+            box=box.ROUNDED
+        ))
+        console.print()
 
 
 if __name__ == "__main__":

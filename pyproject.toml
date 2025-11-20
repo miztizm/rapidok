@@ -41,6 +41,7 @@ dependencies = [
     "tqdm>=4.0.0",
     "urllib3>=1.26.0",
     "requests>=2.25.0",
+    "rich>=13.0.0",
 ]
 
 [project.optional-dependencies]

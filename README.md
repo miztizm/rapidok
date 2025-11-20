@@ -20,7 +20,7 @@ This application streamlines the process of downloading TikTok videos for archiv
 - **Archive Tracking**: Prevent re-downloading videos you already have
 - **Image Download**: Extract high-quality images from TikTok photo carousel/slideshow posts
 - **Robust Error Handling**: Failed downloads are logged with detailed errors for troubleshooting
-- **Color-Coded Output**: Green for success, yellow for skipped, red for errors
+- **Rich Terminal Output**: Beautiful, color-coded CLI with panels, tables, and status indicators
 - **Modern Backend**: Powered by `yt-dlp` for reliable, up-to-date TikTok support
 
 ---
@@ -295,6 +295,75 @@ rapidok --links urls.txt --save-metadata --delay 2.5
 
 ---
 
+## 🎨 Rich Terminal Output
+
+Rapidok features a beautiful, modern terminal interface powered by the [Rich](https://github.com/Textualize/rich) library, providing:
+
+### **Visual Features:**
+- **📊 Formatted Panels**: Configuration and status information displayed in elegant rounded panels
+- **🎨 Color-Coded Messages**:
+  - 🟢 Green `✓` for successful downloads
+  - 🟡 Yellow `⊘` for skipped files
+  - 🔴 Red `✗` for errors
+  - 🔵 Blue `ℹ` for informational messages
+- **📋 Summary Tables**: Download statistics presented in clean, formatted tables
+- **⏳ Progress Indicators**: Real-time status updates during profile fetching and downloads
+- **⚠️ Warning Panels**: Important safety warnings highlighted in colored panels
+
+### **Example Output:**
+
+**Profile Download:**
+```
+╭─────────────────────────── Profile Download Configuration ───────────────────────────╮
+│ Profile: @miztizm                                                                    │
+│ URL: https://www.tiktok.com/@miztizm                                                 │
+│ Output: downloads\miztizm                                                            │
+│ Content Type: video-only                                                             │
+│ Archive: Enabled                                                                     │
+│ Max Downloads: 10                                                                    │
+╰──────────────────────────────────────────────────────────────────────────────────────╯
+
+Fetching profile information...
+✓ Found 152 posts in profile
+
+Downloading 10 posts matching 'video-only' filter...
+
+  [1/10] ✓ Downloaded: Video Title... (video)
+  [2/10] ⊘ Skipping: Already Downloaded... (already exists)
+  ...
+
+                Download Summary
+╭──────────────────┬───────────────────────╮
+│ Metric           │ Value                 │
+├──────────────────┼───────────────────────┤
+│ Username         │ @miztizm              │
+│ Posts Downloaded │ 10/10                 │
+│ Content Type     │ video-only            │
+│ Output Directory │ downloads\miztizm     │
+╰──────────────────┴───────────────────────╯
+```
+
+**Batch Download:**
+```
+╭─────────────────────────── Batch Download Configuration ─────────────────────────────╮
+│ Links File: urls.txt                                                                 │
+│ Total URLs: 5                                                                        │
+│ Workers: 2                                                                           │
+│ Output: downloads                                                                    │
+╰──────────────────────────────────────────────────────────────────────────────────────╯
+
+✓ Downloaded: username/video_id - Title
+✓ Downloaded: username/video_id - Title
+
+╭─────────────────────────── Batch Download Complete ──────────────────────────────────╮
+│ ✓ All downloads completed!                                                           │
+╰──────────────────────────────────────────────────────────────────────────────────────╯
+```
+
+The rich output works seamlessly in all modern terminals and automatically falls back to plain text in environments that don't support colors.
+
+---
+
 ## ⚠️ Rate Limiting & Safety
 
 **IMPORTANT**: TikTok actively monitors and blocks suspicious download patterns. This tool implements multiple safety features to protect you from IP bans:
@@ -435,7 +504,10 @@ The downloader now uses improved format selection:
 
 ### **Dependencies**
 - **yt-dlp**: Modern youtube-dl fork with extensive site support
+- **rich**: Beautiful terminal formatting with colors, panels, and tables
 - **tqdm**: Progress bar library (currently integrated for future enhancements)
+- **requests**: HTTP library for image downloads
+- **urllib3**: HTTP client for SSL handling
 
 ### **Behavior**
 - **Batch mode**: Videos are re-downloaded if they already exist (overwrites)
